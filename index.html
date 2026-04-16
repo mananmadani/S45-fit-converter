@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"/>
+  <title>S45 · Shrinkage & Fit</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="manifest" href="manifest.json"/>
+  <meta name="theme-color" content="#111214"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+</head>
+<body>
+
+  <!-- ── TOPBAR ── -->
+  <header class="topbar">
+    <div class="topbar-logo">
+      <img src="s45-logo.png" alt="S45" class="logo-img" onerror="this.outerHTML='<span class=logo-text>S45</span>'"/>
+    </div>
+    <nav class="tabs" role="tablist">
+      <button class="tab active" id="tab-shrinkage" role="tab" aria-selected="true">SHRINKAGE</button>
+      <button class="tab" id="tab-fit" role="tab" aria-selected="false">FIT</button>
+    </nav>
+    <button class="clear-btn" id="clear-bin" aria-label="Clear all">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+      </svg>
+    </button>
+  </header>
+
+  <!-- ── TOAST ── -->
+  <div id="toast" class="toast" aria-live="polite"></div>
+
+  <!-- ── MAIN ── -->
+  <main>
+
+    <!-- ══ SHRINKAGE ══ -->
+    <section class="panel active" id="shrinkage-panel" role="tabpanel">
+
+      <div class="section-head">
+        <span class="section-title">SHRINKAGE CALCULATOR</span>
+        <span class="section-desc">Measure fabric contraction after wash</span>
+      </div>
+
+      <form id="shrinkageForm" autocomplete="off" novalidate>
+
+        <!-- Column headers -->
+        <div class="col-headers">
+          <span class="col-h-label">DIMENSION</span>
+          <span class="col-h-val">BEFORE</span>
+          <span class="col-h-val">AFTER</span>
+        </div>
+
+        <!-- Rows -->
+        <div class="mrow" data-key="length">
+          <label class="row-label" for="lb">LEN</label>
+          <div class="inp-cell">
+            <input type="number" inputmode="decimal" id="lb" placeholder="—" min="0" step="0.00001" aria-label="Length before wash"/>
+            <span class="inp-unit">in</span>
+          </div>
+          <div class="inp-cell">
+            <input type="number" inputmode="decimal" id="la" placeholder="—" min="0" step="0.00001" aria-label="Length after wash"/>
+            <span class="inp-unit">in</span>
+          </div>
+        </div>
+
+        <div class="mrow" data-key="waist">
+          <label class="row-label" for="wb">WST</label>
+          <div class="inp-cell">
+            <input type="number" inputmode="decimal" id="wb" placeholder="—" min="0" step="0.00001" aria-label="Waist before wash"/>
+            <span class="inp-unit">in</span>
+          </div>
+          <div class="inp-cell">
+            <input type="number" inputmode="decimal" id="wa" placeholder="—" min="0" step="0.00001" aria-label="Waist after wash"/>
+            <span class="inp-unit">in</span>
+          </div>
+        </div>
+
+        <div class="mrow" data-key="thigh">
+          <label class="row-label" for="tb">THG</label>
+          <div class="inp-cell">
+            <input type="number" inputmode="decimal" id="tb" placeholder="—" min="0" step="0.00001" aria-label="Thigh before wash"/>
+            <span class="inp-unit">in</span>
+          </div>
+          <div class="inp-cell">
+            <input type="number" inputmode="decimal" id="ta" placeholder="—" min="0" step="0.00001" aria-label="Thigh after wash"/>
+            <span class="inp-unit">in</span>
+          </div>
+        </div>
+
+        <div class="mrow" data-key="bottom">
+          <label class="row-label" for="bb">BOT</label>
+          <div class="inp-cell">
+            <input type="number" inputmode="decimal" id="bb" placeholder="—" min="0" step="0.00001" aria-label="Bottom before wash"/>
+            <span class="inp-unit">in</span>
+          </div>
+          <div class="inp-cell">
+            <input type="number" inputmode="decimal" id="ba" placeholder="—" min="0" step="0.00001" aria-label="Bottom after wash"/>
+            <span class="inp-unit">in</span>
+          </div>
+        </div>
+
+        <button type="submit" class="run-btn">RUN CALCULATION</button>
+      </form>
+
+      <!-- Results -->
+      <div id="shrink-results" class="results-panel" hidden>
+        <div class="results-head">
+          <span>SHRINKAGE OUTPUT</span>
+          <button class="copy-all-btn" id="copy-shrink" type="button">COPY ALL</button>
+        </div>
+        <div id="shrink-rows"></div>
+        <button id="send-btn" class="send-btn" type="button">
+          → SEND % TO FIT CONVERTER
+        </button>
+      </div>
+
+    </section>
+
+    <!-- ══ FIT CONVERTER ══ -->
+    <section class="panel" id="fit-panel" role="tabpanel">
+
+      <div class="section-head">
+        <span class="section-title">FIT CONVERTER</span>
+        <span class="section-desc">Calculate pre-wash cut size from target</span>
+      </div>
+
+      <form id="fitForm" autocomplete="off" novalidate>
+
+        <!-- Target -->
+        <div class="field-group">
+          <div class="fg-head">TARGET SIZE <span class="fg-unit">inches</span></div>
+          <div class="col-headers tight">
+            <span class="col-h-label">DIM</span>
+            <span class="col-h-val">TARGET</span>
+          </div>
+          <div class="mrow slim" data-key="length">
+            <label class="row-label" for="tl">LEN</label>
+            <div class="inp-cell wide">
+              <input type="number" inputmode="decimal" id="tl" placeholder="—" min="0" step="0.00001" aria-label="Target length"/>
+              <span class="inp-unit">in</span>
+            </div>
+          </div>
+          <div class="mrow slim" data-key="waist">
+            <label class="row-label" for="tw">WST</label>
+            <div class="inp-cell wide">
+              <input type="number" inputmode="decimal" id="tw" placeholder="—" min="0" step="0.00001" aria-label="Target waist"/>
+              <span class="inp-unit">in</span>
+            </div>
+          </div>
+          <div class="mrow slim" data-key="thigh">
+            <label class="row-label" for="tt">THG</label>
+            <div class="inp-cell wide">
+              <input type="number" inputmode="decimal" id="tt" placeholder="—" min="0" step="0.00001" aria-label="Target thigh"/>
+              <span class="inp-unit">in</span>
+            </div>
+          </div>
+          <div class="mrow slim" data-key="bottom">
+            <label class="row-label" for="tbot">BOT</label>
+            <div class="inp-cell wide">
+              <input type="number" inputmode="decimal" id="tbot" placeholder="—" min="0" step="0.00001" aria-label="Target bottom"/>
+              <span class="inp-unit">in</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Actual Shrinkage -->
+        <div class="field-group">
+          <div class="fg-head">ACTUAL SHRINKAGE <span class="fg-unit">%</span></div>
+          <div class="col-headers tight">
+            <span class="col-h-label">DIM</span>
+            <span class="col-h-val">SHRINK %</span>
+          </div>
+          <div class="mrow slim">
+            <label class="row-label" for="al">LEN</label>
+            <div class="inp-cell wide">
+              <input type="number" inputmode="decimal" id="al" placeholder="—" step="0.00001" aria-label="Actual length shrinkage %"/>
+              <span class="inp-unit">%</span>
+            </div>
+          </div>
+          <div class="mrow slim">
+            <label class="row-label" for="aw">WST</label>
+            <div class="inp-cell wide">
+              <input type="number" inputmode="decimal" id="aw" placeholder="—" step="0.00001" aria-label="Actual waist shrinkage %"/>
+              <span class="inp-unit">%</span>
+            </div>
+          </div>
+          <div class="mrow slim">
+            <label class="row-label" for="ath">THG</label>
+            <div class="inp-cell wide">
+              <input type="number" inputmode="decimal" id="ath" placeholder="—" step="0.00001" aria-label="Actual thigh shrinkage %"/>
+              <span class="inp-unit">%</span>
+            </div>
+          </div>
+          <div class="mrow slim">
+            <label class="row-label" for="ab">BOT</label>
+            <div class="inp-cell wide">
+              <input type="number" inputmode="decimal" id="ab" placeholder="—" step="0.00001" aria-label="Actual bottom shrinkage %"/>
+              <span class="inp-unit">%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Farma -->
+        <div class="field-group">
+          <div class="fg-head">FARMA SHRINKAGE <span class="fg-unit">%</span></div>
+          <div class="mrow slim">
+            <label class="row-label" for="fs">ALL</label>
+            <div class="inp-cell wide">
+              <input type="number" inputmode="decimal" id="fs" placeholder="—" step="0.00001" aria-label="Farma shrinkage %"/>
+              <span class="inp-unit">%</span>
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" class="run-btn">RUN CALCULATION</button>
+      </form>
+
+      <!-- Results -->
+      <div id="fit-results" class="results-panel" hidden>
+        <div class="results-head">
+          <span>FIT OUTPUT</span>
+          <button class="copy-all-btn" id="copy-fit" type="button">COPY ALL</button>
+        </div>
+        <div id="fit-rows"></div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- ── FOOTER ── -->
+  <footer class="app-footer">
+    <span>© 2025 S45 JEANS CO.</span>
+  </footer>
+
+  <script src="app.js"></script>
+  <script>if('serviceWorker'in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});</script>
+</body>
+</html>
